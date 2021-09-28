@@ -95,6 +95,9 @@ class Stall:
         else:
             self.inventory[item_name] = quantity
 
+    def compute_cost(self, quantity):
+        return self.cost * quantity
+
     def __str__(self):
         keys = list(self.inventory.keys())
 		#keys_string = ",".join(keys)
