@@ -28,6 +28,7 @@ class Customer:
     # Submit_order takes a cashier, a stall and an amount as parameters, 
     # it deducts the amount from the customer’s wallet and calls the receive_payment method on the cashier object
     def submit_order(self, cashier, stall, amount): 
+        self.wallet -= amount
         cashier.receive_payment(stall, amount) #Is this correct? 
 
     # The __str__ method prints the customer's information.    
@@ -234,8 +235,6 @@ def main():
     #case 4: the customer successfully places an order
     customer_1.validate_order(cashier_1, stall_1, "Poutine", 5)
     customer_2.validate_order(cashier_2, stall_2, "Cotton Candy", 10)
-
-    pass
 
 if __name__ == "__main__":
 	main()
