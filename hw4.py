@@ -176,8 +176,8 @@ class TestAllMethods(unittest.TestCase):
     def test_compute_cost(self):
         #what's wrong with the following statements?
         #can you correct them?
-        self.assertEqual(self.s1.compute_cost(self.s1,5), 51)
-        self.assertEqual(self.s3.compute_cost(self.s3,6), 45)
+        self.assertEqual(self.s1.compute_cost(5), 50)
+        self.assertEqual(self.s3.compute_cost(6), 42)
 
 	# Check that the stall can properly see when it is empty
     def test_has_item(self):
@@ -208,16 +208,32 @@ class TestAllMethods(unittest.TestCase):
 ### Write main function
 def main():
     #Create different objects 
+    inventory_1 = {"Corn Dog":35, "Elephant Ear":40, "Cheese Curds": 70, "Poutine": 55}
+    inventory_2 = {"Cotton Candy":65, "Candied Apple":30, "Fried Oreos": 45}
+    customer_1 = Customer("Anna", 125)
+    customer_2 = Customer("Madison", 70)
+    stall_1 = Stall("Fair Foods #1", inventory_1, 10, 625)
+    stall_2 = Stall("Fair Foods #2", inventory_2, 5, 500)
+    cashier_1 = Cashier("Roger", [stall_1])
+    cashier_2 = Cashier("Greg", [stall_2])
 
     #Try all cases in the validate_order function
     #Below you need to have *each customer instance* try the four cases
     #case 1: the cashier does not have the stall 
+    customer_1.validate_order(cashier_1, stall_2, "Candied Apple", 3)
+    customer_2.validate_order(cashier_2, stall_1, "Cheese Curds", 10)
     
     #case 2: the casher has the stall, but not enough ordered food or the ordered food item
+    customer_1.validate_order(cashier_1, stall_1, "Corn Dog", 40)
+    customer_2.validate_order(cashier_2, stall_2, "Fried Oreos", 50)
     
     #case 3: the customer does not have enough money to pay for the order: 
+    customer_1.validate_order(cashier_1, stall_1, "Elephant Ear", 13)
+    customer_2.validate_order(cashier_2, stall_2, "Candied Apple", 15)
     
     #case 4: the customer successfully places an order
+    customer_1.validate_order(cashier_1, stall_1, "Poutine", 5)
+    customer_2.validate_order(cashier_2, stall_2, "Cotton Candy", 10)
 
     pass
 
