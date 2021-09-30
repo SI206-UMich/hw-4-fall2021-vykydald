@@ -29,7 +29,7 @@ class Customer:
     # it deducts the amount from the customer’s wallet and calls the receive_payment method on the cashier object
     def submit_order(self, cashier, stall, amount): 
         self.wallet -= amount
-        cashier.receive_payment(stall, amount) #Is this correct? 
+        cashier.receive_payment(stall, amount) 
 
     # The __str__ method prints the customer's information.    
     def __str__(self):
@@ -79,15 +79,15 @@ class Stall:
         self.cost = cost
         self.earnings = earnings
 
-    def process_order(self, item_name, quantity):
-        if (item_name in self.inventory):
-            self.inventory[item_name] -= quantity
-            self.earnings += self.cost * quantity
+    def process_order(self, item_name, quantity): 
+        if (self.has_item(item_name, quantity)): 
+            self.inventory[item_name] -= quantity #Anything to add???
 
     def has_item(self, item_name, quantity):
         enough_food = False
-        if(self.inventory[item_name] >= quantity):
-            enough_food = True
+        if(item_name in self.inventory): 
+            if(self.inventory[item_name] >= quantity):
+                enough_food = True
         return enough_food
 
     def stock_up(self, item_name, quantity):
@@ -99,10 +99,10 @@ class Stall:
     def compute_cost(self, quantity):
         return self.cost * quantity
 
-    def __str__(self):
-        keys = list(self.inventory.keys())
-		#keys_string = ",".join(keys)
-        return "Hello, we are " + self.name + ". This is the current menu " + keys + ". We charge $" + self.cost + " per item. We have $" + self.money + " in total."
+    def __str__(self): 
+        keys_list = list(self.inventory.keys())
+        keys_string = ", ".join(keys_list)
+        return "Hello, we are " + self.name + ". This is the current menu " + keys_string + ". We charge $" + str(self.cost) + " per item. We have $" + str(self.earnings) + " in total."
 
 
 class TestAllMethods(unittest.TestCase):
@@ -183,28 +183,61 @@ class TestAllMethods(unittest.TestCase):
 	# Check that the stall can properly see when it is empty
     def test_has_item(self):
         # Set up to run test cases
+        inventory = {"Chicken Nuggets":40, "Fries":50, "Salad":25}
+        s5 = Stall("Misc Stall #2", inventory)
 
         # Test to see if has_item returns True when a stall has enough items left
         # Please follow the instructions below to create three different kinds of test cases 
         # Test case 1: the stall does not have this food item: 
+        self.assertEqual(s5.has_item("Onion Rings", 10), False) 
         
         # Test case 2: the stall does not have enough food item: 
+        self.assertEqual(s5.has_item("Fries", 55), False)
         
         # Test case 3: the stall has the food item of the certain quantity: 
-        pass
+        self.assertEqual(s5.has_item("Chicken Nuggets", 40), True)
 
 	# Test validate order
-    def test_validate_order(self):
+    def test_validate_order(self):  
+        inventory = {"Grilled Cheese Sandwich":50, "Onion Rings":30, "Bacon Fries":10} 
+        f3 = Customer("Dahlia")
+        s6 = Stall("Misc Stall #3", inventory, cost = 8)
+        s7 = Stall("Misc Stall #4", inventory, cost = 9)
+        c4 = Cashier("Jack", [s6])
+        before_custormer_wallet = f3.wallet
+        before_earnings_stall_1 = s6.earnings
+        before_earnings_stall_2 = s7.earnings
+
 		# case 1: test if a customer doesn't have enough money in their wallet to order
+        f3.validate_order(c4, s6, "Onion Rings", 13)
+        self.assertEqual(f3.wallet, before_custormer_wallet) # See if the customer's money has remained the same
+        self.assertEqual(s6.earnings, before_earnings_stall_1) # See if the stall still has zero earnings
+        self.assertEqual(s6.inventory, inventory) # See if the stall's inventory has remained the same 
 
 		# case 2: test if the stall doesn't have enough food left in stock
+        f3.validate_order(c4, s6, "Bacon Fries", 11)
+        self.assertEqual(f3.wallet, before_custormer_wallet) # See if the customer's money has remained the same
+        self.assertEqual(s6.earnings, before_earnings_stall_1) # See if the stall still has zero earnings
+        self.assertEqual(s6.inventory, inventory) # See if the stall's inventory has remained the same 
 
 		# case 3: check if the cashier can order item from that stall
-        pass
+        f3.validate_order(c4, s7, "Grilled Cheese Sandwich", 5)
+        self.assertEqual(f3.wallet, before_custormer_wallet) # See if the customer's money has remained the same
+        self.assertEqual(s7.earnings, before_earnings_stall_2) # See if the stall still has zero earnings
+        self.assertEqual(s6.inventory, inventory) # See if the stall's inventory has remained the same 
 
+        # case 4: test if the customer succesfully places the order
+        f3.validate_order(c4, s6, "Grilled Cheese Sandwich", 5)
+        self.assertEqual(f3.wallet, before_custormer_wallet - 40) # See if the customer's money has decreased
+        self.assertEqual(s6.earnings, before_earnings_stall_2 + 40) # See if the stall has made earnings
+        self.assertEqual(s6.inventory, {"Grilled Cheese Sandwich":45, "Onion Rings":30, "Bacon Fries":10}) # See if the stall's inventory has decreased
+ 
     # Test if a customer can add money to their wallet
     def test_reload_money(self):
-        pass
+        f4 = Customer("Rachel")
+        past_custormer_wallet = f4.wallet
+        f4.reload_money(100)
+        self.assertEqual(f4.wallet, past_custormer_wallet + 100)
     
 ### Write main function
 def main():
